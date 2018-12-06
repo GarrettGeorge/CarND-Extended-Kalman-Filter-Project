@@ -37,8 +37,13 @@ int main()
   Tools tools;
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
+  
+  double max_x_e = 0.0;
+  double max_y_e = 0.0;
+  double max_vx_e = 0.0;
+  double max_vy_e = 0.0;
 
-  h.onMessage([&fusionEKF,&tools,&estimations,&ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&fusionEKF,&tools,&estimations,&ground_truth,&max_x_e,&max_y_e,&max_vx_e,&max_vy_e](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -126,6 +131,23 @@ int main()
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
 
+//           if (RMSE(0) > max_x_e) {
+//             max_x_e = RMSE(0);            
+//           	cout << "max_x_e = " << max_x_e << endl;
+//           }
+//           if (RMSE(1) > max_y_e) {
+//             max_y_e = RMSE(1);            
+//           	cout << "max_y_e = " << max_y_e << endl;
+//           }
+//           if (RMSE(2) > max_vx_e) {
+//             max_vx_e = RMSE(2);            
+//           	cout << "max_vx_e = " << max_vx_e << endl;
+//           }
+//           if (RMSE(3) > max_vy_e) {
+//             max_vy_e = RMSE(3);            
+//           	cout << "max_vy_e = " << max_vy_e << endl;
+//           }
+          
           json msgJson;
           msgJson["estimate_x"] = p_x;
           msgJson["estimate_y"] = p_y;
@@ -139,12 +161,10 @@ int main()
 	  
         }
       } else {
-        
         std::string msg = "42[\"manual\",{}]";
         ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
       }
     }
-
   });
 
   // We don't need this since we're not using HTTP but if it's removed the program
